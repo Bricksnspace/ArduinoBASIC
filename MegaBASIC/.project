@@ -44,7 +44,7 @@
 		<link>
 			<name>libraries/Adafruit_GFX_Library</name>
 			<type>2</type>
-			<location>/home/mario/Arduino/libraries/Adafruit_GFX_Library</location>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_GFX_Library/1.4.8</locationURI>
 		</link>
 		<link>
 			<name>libraries/Adafruit_ILI9341</name>
@@ -59,7 +59,7 @@
 		<link>
 			<name>libraries/Adafruit_ST7735_and_ST7789_Library</name>
 			<type>2</type>
-			<location>/home/mario/Arduino/libraries/Adafruit_ST7735_and_ST7789_Library</location>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_ST7735_and_ST7789_Library/1.2.8</locationURI>
 		</link>
 		<link>
 			<name>libraries/EEPROM</name>
@@ -69,7 +69,7 @@
 		<link>
 			<name>libraries/PS2Keyboard</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/PS2Keyboard/2.4.0</locationURI>
+			<location>/home/mario/Arduino/libraries/PS2Keyboard</location>
 		</link>
 		<link>
 			<name>libraries/SPI</name>

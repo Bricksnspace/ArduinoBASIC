@@ -54,6 +54,6 @@ namespace st7735screen {
 #include "screendefs.h"
 
 
-} /* namespace hardware */
+} /* namespace st7735screen */
 
 #endif /* ST7735SCREEN_H_ */

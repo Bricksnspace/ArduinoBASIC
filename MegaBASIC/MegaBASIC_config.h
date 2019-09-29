@@ -46,19 +46,19 @@
 // Like Adafruit 1.8" small RGB TFT without touch
 // size 128x160
 // 21chr * 20rows or 26chr * 16rows
-#define SPI_ST7735	1
+#define SPI_ST7735	0
 
 // RGB TFT display from 2.2" to 3.2"
 // size 240x320
 // 40chr * 40rows or 53chr * 30rows
-#define SPI_ILI9341	0
+#define SPI_ILI9341	1
 
 // size in pixel
-#define PIXEL_WIDTH		128
-#define PIXEL_HEIGHT	160
-// screen size in column/rows using a 5x7 base font
-#define SCREEN_WIDTH        21
-#define SCREEN_HEIGHT       20
+#define PIXEL_WIDTH		240
+#define PIXEL_HEIGHT	320
+// screen size in column/rows using a 5x7 base font, 6x8 character cell
+#define SCREEN_WIDTH        40
+#define SCREEN_HEIGHT       40
 // Screen SPI pins (I2C pins are hardware SDA/SCL on Arduino)
 // using hardware SPI
 #define SCR_SPI_MOSI 51
