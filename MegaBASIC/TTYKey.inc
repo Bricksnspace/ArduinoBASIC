@@ -16,17 +16,16 @@
  */
 
 /*
- * TTYScreen.cpp
+ * TTYKey.cpp
  *
  *  Created on: 09 apr 2019
  *      Author: Mario Pascucci
  */
 
 #include <Arduino.h>
-#include "MegaBASIC_config.h"
-#include "TTYScreen.h"
+#include "TTYKey.h"
 
-namespace ttyscreen {
+namespace keyboard {
 
 void init(void) {
 	Serial.begin(SERIAL_SPEED);
@@ -35,41 +34,12 @@ void init(void) {
 	}
 }
 
-void outputString(char const * s) {
-	Serial.print(s);
+bool available(void) {
+	return Serial.available() > 0 ;
 }
 
-void outputProgMemString(const char* s) {
-	unsigned char c;
-    while ((c = pgm_read_byte(s++)) != 0) {
-        outputChar(c);
-    }
+char read(void) {
+	return Serial.read();
 }
 
-int outputChar(char c) {
-	Serial.print(c);
-	return 0;
-}
-
-int outputInt(long num) {
-	return Serial.print(num);
-}
-
-void newLine(void) {
-	Serial.print('\n');
-}
-
-void cls(void) {};
-void moveCursor(int, int) {};
-void showBuffer(void) {};
-void scrollBuffer(void) {};
-int getX(void) { return 0; }
-int getY(void) {return 0; }
-void showCursor(bool ) {};
-void freeLine(void) {};
-void blink(void) {};
-void redraw(void) {};
-char *getBuffer(int , int ) { return nullptr; };
-
-
-} /* namespace ttyscreen */
+} /* namespace keyboard */

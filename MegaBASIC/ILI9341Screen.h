@@ -49,14 +49,6 @@
 #define LINE_HEIGHT	8
 
 
-namespace ili9341screen {
-
-
-#include "screendefs.h"
-
-
-} /* namespace ili9341screen */
-
 
 
 #endif /* ILI9341SCREEN_H_ */

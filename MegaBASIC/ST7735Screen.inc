@@ -27,7 +27,7 @@
 
 // TODO: ottimizzare la stampa a schermo
 
-namespace st7735screen {
+namespace screen {
 
 char screenBuffer[SCREEN_HEIGHT][SCREEN_WIDTH+1];
 char lineDirty[SCREEN_HEIGHT];
@@ -246,4 +246,4 @@ void plot(int x, int y)
 
 
 
-} /* namespace st7735screen */
+} /* namespace screen */

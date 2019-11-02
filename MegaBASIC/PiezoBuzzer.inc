@@ -16,24 +16,43 @@
 */
 
 /*
- * SSD1306Screen.h
+ * PiezoBuzzer.cpp
  *
- *  Created on: 23 mag 2019
- *      Author: mario
+ *  Created on: 10 apr 2019
+ *      Author: Mario Pascucci
  */
 
-#ifndef SSD1306SCREEN_H_
-#define SSD1306SCREEN_H_
+
+#include <Arduino.h>
+#include "MegaBASIC_config.h"
+#include "Buzzer.h"
+
+namespace buzzer {
+
+void init(void) {
+	pinMode(BUZZER_PIN, OUTPUT);
+}
 
 
-
-#include "Adafruit_SSD1306.h"
-
-
-// standard values for 5x7 characters
-#define CHAR_WIDTH	6
-#define LINE_HEIGHT	8
+void click(void) {
+	digitalWrite(BUZZER_PIN, HIGH);
+    delay(1);
+    digitalWrite(BUZZER_PIN, LOW);
+}
 
 
+void startupTone(void) {
+	for (int i=1; i<=2; i++) {
+		for (int j=0; j<50*i; j++) {
+			digitalWrite(BUZZER_PIN, HIGH);
+			delay(3-i);
+			digitalWrite(BUZZER_PIN, LOW);
+			delay(3-i);
+		}
+		delay(100);
+	}
+}
 
-#endif /* SSD1306SCREEN_H_ */
+} /* namespace buzzer */
+
+

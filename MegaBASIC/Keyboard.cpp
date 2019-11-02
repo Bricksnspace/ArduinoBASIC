@@ -16,24 +16,26 @@
 */
 
 /*
- * SSD1306Screen.h
+ * Keyboard.cpp
  *
- *  Created on: 23 mag 2019
- *      Author: mario
+ *  Created on: 02 nov 2019
+ *      Author: Mario Pascucci
  */
 
-#ifndef SSD1306SCREEN_H_
-#define SSD1306SCREEN_H_
+
+// System configuration
+#include "MegaBASIC_config.h"
 
 
-
-#include "Adafruit_SSD1306.h"
-
-
-// standard values for 5x7 characters
-#define CHAR_WIDTH	6
-#define LINE_HEIGHT	8
+#include "Keyboard.h"
 
 
+#if WITH_PS2KEY
+#include "PS2Key.inc"
+#elif WITH_SERIAL_INPUT
+#include "TTYKey.inc"
+#else
+#error "Please choose a keyboard type"
+#endif	// WITH_PS2KEY
 
-#endif /* SSD1306SCREEN_H_ */
+

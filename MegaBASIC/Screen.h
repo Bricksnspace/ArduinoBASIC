@@ -16,15 +16,16 @@
 */
 
 /*
- * screendefs.h
+ * Screen.h
  *
- *  Created on: 05 mag 2019
+ *  Created on: 02 nov 2019
  *      Author: Mario Pascucci
  */
 
-#ifndef SCREENDEFS_H_
-#define SCREENDEFS_H_
+#ifndef SCREEN_H_
+#define SCREEN_H_
 
+namespace screen {
 
 void init(void);
 void cls(void);
@@ -36,7 +37,7 @@ int getY(void);
 void showCursor(bool );
 void freeLine(void);
 void blink(void);
-void redraw(void);
+//void redraw(void);
 void outputString(char const *s);
 void outputProgMemString(const char *s);
 int outputChar(char);
@@ -48,6 +49,8 @@ void color(unsigned char,unsigned char, unsigned char);
 void color(unsigned int);
 void plot(int,int);
 
+} /* namespace screen */
 
 
-#endif /* SCREENDEFS_H_ */
+
+#endif /* SCREEN_H_ */

@@ -40,18 +40,18 @@
 // some monochrome OLED and small TFT screen
 // screen size is 128x64 pixel
 // 21chr * 8rows or 10chr * 16rows
-#define SPI_SSD1306	0		// SPI interface
+#define SPI_SSD1306	0		// SPI interface (not implemented yet)
 #define I2C_SSD1306	0		// I2C interface
 
 // Like Adafruit 1.8" small RGB TFT without touch
 // size 128x160
 // 21chr * 20rows or 26chr * 16rows
-#define SPI_ST7735	0
+#define SPI_ST7735	1
 
 // RGB TFT display from 2.2" to 3.2"
 // size 240x320
 // 40chr * 40rows or 53chr * 30rows
-#define SPI_ILI9341	1
+#define SPI_ILI9341	0
 
 // size in pixel
 #define PIXEL_WIDTH		240
@@ -85,7 +85,7 @@
 //////////////////////////////////////////////////
 #define WITH_SERIAL_CONSOLE 0
 // same for keyboard
-#define WITH_SERIAL_INPUT	1
+#define WITH_SERIAL_INPUT	0
 #define SERIAL_SPEED		115200L
 
 
@@ -93,7 +93,7 @@
 //////////////////////////////////////////////////
 // PS/2 keyboard
 //////////////////////////////////////////////////
-#define WITH_PS2KEY			0
+#define WITH_PS2KEY			1
 // PS2 pin definition
 #define PS2DATA				8
 #define PS2IRQ				3

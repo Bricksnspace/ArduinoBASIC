@@ -25,10 +25,6 @@
 #ifndef TTYSCREEN_H_
 #define TTYSCREEN_H_
 
-namespace ttyscreen {
 
-#include "screendefs.h"
-
-} /* namespace ttyscreen */
 
 #endif /* TTYSCREEN_H_ */

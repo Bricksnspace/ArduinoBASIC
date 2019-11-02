@@ -25,14 +25,14 @@
 #ifndef BUZZER_H_
 #define BUZZER_H_
 
-namespace nullbuzzer {
+namespace buzzer {
 
-// a virtual buzzer, i.e. a system without buzzer
+// buzzer functions
 void init(void);
 void click(void);
 void startupTone(void);
 
 
-} /* namespace nullbuzzer */
+} /* namespace buzzer */
 
 #endif /* BUZZER_H_ */

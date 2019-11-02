@@ -16,23 +16,21 @@
 */
 
 /*
- * PiezoBuzzer.h
+ * Keyboard.h
  *
- *  Created on: 10 apr 2019
+ *  Created on: 02 nov 2019
  *      Author: Mario Pascucci
  */
 
-#ifndef PIEZOBUZZER_H_
-#define PIEZOBUZZER_H_
+#ifndef KEYBOARD_H_
+#define KEYBOARD_H_
 
-
-namespace piezobuzzer {
+namespace keyboard {
 
 void init(void);
-void click(void);
-void startupTone(void);
+bool available(void);
+char read(void);
 
-}	// namespace piezobuzzer
+} /* namespace keyboard */
 
-
-#endif /* PIEZOBUZZER_H_ */
+#endif /* KEYBOARD_H_ */

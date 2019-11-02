@@ -31,46 +31,13 @@
 #include "MegaBASIC_config.h"
 
 // keyboard
-#if WITH_PS2KEY
-#include <PS2Key.h>
-namespace keyboard = ps2key;
-#elif WITH_SERIAL_INPUT
-#include "TTYKey.h"
-namespace keyboard = ttykey;
-#else
-#error "Please choose a keyboard type"
-#endif	// WITH_PS2KEY
+#include "Keyboard.h"
 
 // screen
-#if WITH_EXT_SCREEN
-#if SPI_ST7735
-#include "ST7735Screen.h"
-namespace screen = st7735screen;
-#elif SPI_SSD1306
-#include "SSD1306Screen.h"
-namespace screen = ssd1306screen;
-#elif I2C_SSD1306
-#include "SSD1306Screen.h"
-namespace screen = ssd1306screen;
-#elif SPI_ILI9341
-#include "ILI9341Screen.h"
-namespace screen = ili9341screen;
-#endif
-#elif WITH_SERIAL_CONSOLE
-#include "TTYScreen.h"
-namespace screen = ttyscreen;
-#else
-#error "Please choose a screen type"
-#endif 	// WITH_EXT_SCREEN
+#include "Screen.h"
 
 // buzzer
-#if WITH_BUZZER
-#include "PiezoBuzzer.h"
-namespace buzzer = piezobuzzer;
-#else
 #include "Buzzer.h"
-namespace buzzer = nullbuzzer;
-#endif // WITH_BUZZER
 
 
 // program memory

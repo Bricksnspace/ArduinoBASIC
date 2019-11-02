@@ -39,7 +39,6 @@
 #ifndef ST7735SCREEN_H_
 #define ST7735SCREEN_H_
 
-#include "MegaBASIC_config.h"
 #include "Adafruit_ST7735.h"
 
 
@@ -47,13 +46,5 @@
 #define CHAR_WIDTH	6
 #define LINE_HEIGHT	8
 
-
-namespace st7735screen {
-
-
-#include "screendefs.h"
-
-
-} /* namespace st7735screen */
 
 #endif /* ST7735SCREEN_H_ */

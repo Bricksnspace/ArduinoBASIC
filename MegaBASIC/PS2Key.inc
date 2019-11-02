@@ -27,7 +27,7 @@
 
 
 
-namespace ps2key {
+namespace keyboard {
 
 PS2Keyboard keybrd;
 
@@ -45,4 +45,5 @@ char read(void) {
 }
 
 
-} /* namespace ps2key */
+} /* namespace keyboard */
+
