@@ -28,13 +28,5 @@
 #include <PS2Keyboard.h>
 
 
-namespace ps2key {
-
-void init(void);
-bool available(void);
-char read(void);
-
-
-} /* namespace ps2key */
 
 #endif /* PS2KEY_H_ */

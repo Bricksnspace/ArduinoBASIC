@@ -16,47 +16,33 @@
 */
 
 /*
- * PiezoBuzzer.cpp
+ * Screen.cpp
  *
- *  Created on: 10 apr 2019
+ *  Created on: 02 nov 2019
  *      Author: Mario Pascucci
  */
 
 
-#include <Arduino.h>
+// System configuration
 #include "MegaBASIC_config.h"
-#include "PiezoBuzzer.h"
 
 
-namespace piezobuzzer {
+#include "Screen.h"
 
-
-
-void init(void) {
-	pinMode(BUZZER_PIN, OUTPUT);
-}
-
-
-void click(void) {
-	digitalWrite(BUZZER_PIN, HIGH);
-    delay(1);
-    digitalWrite(BUZZER_PIN, LOW);
-}
-
-
-void startupTone(void) {
-	for (int i=1; i<=2; i++) {
-		for (int j=0; j<50*i; j++) {
-			digitalWrite(BUZZER_PIN, HIGH);
-			delay(3-i);
-			digitalWrite(BUZZER_PIN, LOW);
-			delay(3-i);
-		}
-		delay(100);
-	}
-}
-
-
-}	// namespace piezobuzzer
+#if WITH_EXT_SCREEN
+#if SPI_ST7735
+#include "ST7735Screen.inc"
+#elif SPI_SSD1306
+#include "SSD1306Screen.inc"
+#elif I2C_SSD1306
+#include "SSD1306Screen.inc"
+#elif SPI_ILI9341
+#include "ILI9341Screen.inc"
+#endif
+#elif WITH_SERIAL_CONSOLE
+#include "TTYScreen.inc"
+#else
+#error "Please choose a screen type"
+#endif 	// WITH_EXT_SCREEN
 
 

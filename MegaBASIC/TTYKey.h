@@ -26,12 +26,4 @@
 #define TTYKEY_H_
 
 
-namespace ttykey {
-
-	void init(void);
-	bool available(void);
-	char read(void);
-
-} /* namespace ttykey */
-
 #endif /* TTYKEY_H_ */

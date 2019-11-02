@@ -306,7 +306,7 @@ char *readLine()
                     startPosY--;
                     //pos -= SCREEN_WIDTH;
                     screen::outputChar(c);
-                    screen::redraw();
+                    screen::showBuffer();
                 }
                 //else
                 //{
@@ -318,7 +318,7 @@ char *readLine()
             else
             {
             	screen::outputChar(c);
-            	screen::redraw();
+            	screen::showBuffer();
             }
         }
     }

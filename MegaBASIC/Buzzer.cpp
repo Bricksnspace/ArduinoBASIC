@@ -23,13 +23,21 @@
  */
 
 
+// System configuration
+#include "MegaBASIC_config.h"
+
 #include "Buzzer.h"
 
-namespace nullbuzzer {
 
+
+#if WITH_BUZZER
+#include "PiezoBuzzer.inc"
+#else
+namespace buzzer {
 void init(void) {};
 void click(void) {};
 void startupTone(void) {};
+} /* namespace buzzer */
+#endif
 
 
-} /* namespace nullbuzzer */

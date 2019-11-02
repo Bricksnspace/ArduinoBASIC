@@ -31,7 +31,7 @@
 
 // TODO: to optimize text see scroll functions
 
-namespace ssd1306screen {
+namespace screen {
 
 char screenBuffer[SCREEN_HEIGHT][SCREEN_WIDTH+1];
 char lineDirty[SCREEN_HEIGHT];
@@ -41,9 +41,14 @@ volatile bool flash = 1, needRedraw = 0;
 int curColor = WHITE;
 
 
+// TODO: this is for I2C display, add SPI when available
+
+#if I2C_SSD1306
 // last parameter is Reset pin, -1 if none or linked with Arduino Reset
 Adafruit_SSD1306 display(PIXEL_WIDTH, PIXEL_HEIGHT, &Wire, -1);
-
+#else
+#error "SPI SSD1306 not implemented yet"
+#endif
 
 void init()
 {
@@ -107,25 +112,6 @@ void scrollBuffer(void) {
     memcpy(screenBuffer[0], screenBuffer[1], (SCREEN_WIDTH+1)*(SCREEN_HEIGHT-1));
     memset(screenBuffer[SCREEN_HEIGHT-1], 32, SCREEN_WIDTH);
     memset(lineDirty, 1, SCREEN_HEIGHT);
-}
-
-
-void outputString(char const* str)
-{
-	while (*str)
-	{
-		outputChar(*str++);
-	}
-}
-
-
-
-void outputProgMemString(const char* p) {
-    while (1) {
-        unsigned char c = pgm_read_byte(p++);
-        if (c == 0) break;
-        outputChar((char)c);
-    }
 }
 
 
@@ -196,6 +182,30 @@ int outputInt(long num)
 	return l;
 }
 
+
+
+void outputString(char * str)
+{
+	while (*str)
+	{
+		outputChar(*str++);
+	}
+}
+
+
+
+void outputProgMemString(const char* p) {
+    while (1) {
+        unsigned char c = pgm_read_byte(p++);
+        if (c == 0) break;
+        outputChar((char)c);
+    }
+}
+
+
+
+
+
 void newLine(void)
 {
 	outputChar('\n');
@@ -262,6 +272,6 @@ void plot(int x, int y)
 }
 
 
-} /* namespace ssd1306screen */
+} /* namespace screen */
 
 
