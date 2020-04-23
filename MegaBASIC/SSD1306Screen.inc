@@ -19,7 +19,7 @@
  * SSD1306Screen.cpp
  *
  *  Created on: 23 mag 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 

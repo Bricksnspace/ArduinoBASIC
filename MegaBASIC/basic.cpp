@@ -37,6 +37,23 @@
  *  - PIN <pin>, <state> - sets the pin high (non zero) or low (zero)
  *  - PINREAD(pin) returns pin value, ANALOGRD(pin) for analog pins
  * ---------------------------------------------------------------------------
+ *
+ * Copyright 2020 Mario Pascucci <mpascucci@gmail.com>
+ *
+ * added:
+ * - ASC
+ * - CHR$
+ * - FREE
+ * - MSTIME
+ * - SIN
+ * - COS
+ * - TAN
+ * - PLOT
+ * - COLOR
+ * - CIRCLE
+ * - LINE
+ * - RECT
+ *
  */
 
 // TODO
@@ -1978,6 +1995,10 @@ int parseSimpleCmd() {
                 host::showBuffer();
                 break;
             case TOKEN_DIR:
+#if WITH_SDCARD
+            	if (host::SdDir() < 0)
+            		return ERROR_BAD_PARAMETER;
+#endif
 #if EXTERNAL_EEPROM
                 host::directoryExtEEPROM();
 #endif

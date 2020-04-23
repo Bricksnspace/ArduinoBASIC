@@ -1,5 +1,6 @@
 /*
 	Copyright 2019 Mario Pascucci <mpascucci@gmail.com>
+	Copyright 2014 Robin Edwards
 
 	This is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,7 +20,7 @@
  * host.h
  *
  *  Created on: 08 mag 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 #ifndef HOST_H_
@@ -53,7 +54,9 @@
 #error "Please choose RAM type"
 #endif	// RAM
 
-
+#if WITH_SDCARD
+#include <SD.h>
+#endif
 
 #define MAGIC_AUTORUN_NUMBER    0xFC
 
@@ -88,6 +91,9 @@ int loadProgram();
 void color(int,int,int);
 void plot(int, int);
 
+#if WITH_SDCARD
+int SdDir(void);
+#endif
 
 #if WITH_EXT_EEPROM
 #include <I2cMaster.h>

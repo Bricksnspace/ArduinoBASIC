@@ -19,7 +19,7 @@
  * ILI9341Screen.h
  *
  *  Created on: 03 giu 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 /*

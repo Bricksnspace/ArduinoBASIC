@@ -72,6 +72,11 @@
 			<location>/home/mario/Arduino/libraries/PS2Keyboard</location>
 		</link>
 		<link>
+			<name>libraries/SD</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/SD/1.2.3</locationURI>
+		</link>
+		<link>
 			<name>libraries/SPI</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.6.23/libraries/SPI</locationURI>

@@ -1,5 +1,6 @@
 /*
 	Copyright 2019 Mario Pascucci <mpascucci@gmail.com>
+	Copyright 2014 Robin Edwards
 
 	This is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,7 +20,7 @@
  * ILI9341Screen.cpp
  *
  *  Created on: 03 giu 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 
@@ -32,8 +33,9 @@
 
 namespace screen {
 
-char screenBuffer[SCREEN_HEIGHT][SCREEN_WIDTH+1];
+char screenBuffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 char lineDirty[SCREEN_HEIGHT];
+char underCursor = ' ';
 int curX = 0, curY = 0;
 bool inputMode = false;
 volatile bool flash = 1, needRedraw = 0;
@@ -46,9 +48,34 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(SCR_SPI_CS, SCR_SPI_DC, SCR_SPI_RST);
 void init()
 {
 	tft.begin();
+	tft.setRotation(3);
 	tft.setTextColor(ILI9341_YELLOW,ILI9341_BLUE);
 	tft.setTextWrap(false);
+	if (SCR_BACKLIT != 0)
+	{
+		pinMode(SCR_BACKLIT, 1);
+		digitalWrite(SCR_BACKLIT,1);
+	}
 }
+
+
+void screenOff(void)
+{
+	if (SCR_BACKLIT != 0)
+	{
+		digitalWrite(SCR_BACKLIT,0);
+	}
+}
+
+
+void screenOn(void)
+{
+	if (SCR_BACKLIT != 0)
+	{
+		digitalWrite(SCR_BACKLIT,1);
+	}
+}
+
 
 void cls(void)
 {
@@ -70,13 +97,11 @@ void showBuffer(void)
     for (int y=0; y<SCREEN_HEIGHT; y++) {
         if (lineDirty[y] || (inputMode && y==curY)) {
             moveCursor(0,y);
-            screenBuffer[y][SCREEN_WIDTH] = 0;	// make sure string is terminated
-            tft.print(screenBuffer[y]);
-//            for (int x=0; x<SCREEN_WIDTH; x++) {
-//                char c = screenBuffer[y][x];
-                // XXX move to buffer writing if (c=='\r') c = ' ';
-//                tft.write(c);
-//            }
+//            screenBuffer[y][SCREEN_WIDTH] = 0;	// make sure string is terminated
+//            tft.print(screenBuffer[y]);
+            for (int x=0; x<SCREEN_WIDTH; x++) {
+                tft.write(screenBuffer[y][x]);
+            }
             lineDirty[y] = 0;
         }
     }
@@ -93,18 +118,11 @@ void blink(void) {
 }
 
 
-//void redraw(void)
-//{
-//	needRedraw = true;
-//}
-
 
 void scrollBuffer(void) {
-    memcpy(screenBuffer[0], screenBuffer[1], (SCREEN_WIDTH+1)*(SCREEN_HEIGHT-1));
+    memcpy(screenBuffer[0], screenBuffer[1], (SCREEN_WIDTH)*(SCREEN_HEIGHT-1));
     memset(screenBuffer[SCREEN_HEIGHT-1], 32, SCREEN_WIDTH);
-    //memset(lineDirty, 1, SCREEN_HEIGHT);
-    tft.scrollTo(LINE_HEIGHT);
-    lineDirty[SCREEN_HEIGHT-1] = 1;
+    memset(lineDirty, 1, SCREEN_HEIGHT);
 }
 
 
@@ -133,9 +151,7 @@ int outputChar(char c)
 //    int pos = curY*SCREEN_WIDTH+curX;
 	switch (c)
 	{
-	case 0x7f:
-	//if (c==0x7f)		// ASCII Del as Backspace
-    //{
+	case KEY_BACKSPACE:
     	if (curX == 0)
     	{
     		if (curY > 0)
@@ -150,11 +166,7 @@ int outputChar(char c)
     	screenBuffer[curY][curX] = 32;
     	lineDirty[curY] = 1;
     	break;
-    //}
 	case '\n':
-		// do a "newline" with implicit "CR"
-    //else if (c == '\n')
-    //{
     	if (++curY == SCREEN_HEIGHT)
     	{
     		scrollBuffer();
@@ -167,7 +179,6 @@ int outputChar(char c)
 		curX = 0;
 		lineDirty[curY] = 1;
 		break;
-    //}
 	default:
         screenBuffer[curY][curX++] = c;
         lineDirty[curY] = 1;
@@ -223,9 +234,20 @@ void showCursor(bool show)
 	showBuffer();
 }
 
-char* getBuffer(int , int ) {
-//	return screenBuffer+y*SCREEN_WIDTH+x;
-	return nullptr;
+char* getBuffer(int x, int y)
+{
+#if MEGA_DEBUG
+	Serial.print("r=");
+	Serial.print(y);
+	Serial.print(" c=");
+	Serial.print(x);
+	Serial.print(" cr=");
+	Serial.print(curY);
+	Serial.print(" cc=");
+	Serial.println(curX);
+#endif
+	screenBuffer[curY][curX] = 0;	// buffer termination
+	return &screenBuffer[y][x];
 }
 
 

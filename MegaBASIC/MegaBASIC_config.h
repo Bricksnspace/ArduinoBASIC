@@ -19,7 +19,7 @@
  * MegaBAISC_config.h
  *
  *  Created on: 08 mag 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 #ifndef MEGABASIC_CONFIG_H_
@@ -29,6 +29,29 @@
 /****************************************
  * System configuration
  ****************************************/
+
+// control codes
+#define KEY_CTRLC		3
+#define KEY_BACKSPACE	8
+#define KEY_TAB			9
+#define KEY_LF			10
+#define KEY_CTRLL		12
+#define KEY_CR			13
+#define KEY_ESC			27
+
+#define KEY_RIGHTARROW    0x1E
+#define KEY_LEFTARROW     0x1F
+#define KEY_UPARROW       0x1C
+#define KEY_DOWNARROW     0x1D
+#define KEY_DELETE        127
+#define KEY_HOME          0x01
+#define KEY_INSERT        134
+#define KEY_PAGEDOWN      135
+#define KEY_PAGEUP        136
+#define KEY_END           0x0F
+
+
+
 
 //////////////////////////////////////////////////
 // External display
@@ -54,30 +77,43 @@
 #define SPI_ILI9341	1
 
 // size in pixel
-#define PIXEL_WIDTH		240
-#define PIXEL_HEIGHT	320
+#define PIXEL_WIDTH		320
+#define PIXEL_HEIGHT	240
 // screen size in column/rows using a 5x7 base font, 6x8 character cell
-#define SCREEN_WIDTH        40
-#define SCREEN_HEIGHT       40
+#define SCREEN_WIDTH        53
+#define SCREEN_HEIGHT       30
 // Screen SPI pins (I2C pins are hardware SDA/SCL on Arduino)
 // using hardware SPI
 #define SCR_SPI_MOSI 51
 #define SCR_SPI_MISO 50
 #define SCR_SPI_CLK 52
-#define SCR_SPI_DC 49
-#define SCR_SPI_CS 53
+#define SCR_SPI_DC 46
+#define SCR_SPI_CS 49
 // use -1 for reset if pin is connected to Arduino Reset
 #define SCR_SPI_RST -1
+// set to backlit pin or 0 if none
+#define SCR_BACKLIT 45
+
+
 
 
 
 //////////////////////////////////////////////////
-// External EEPROM
+// SD card
 //////////////////////////////////////////////////
-#define WITH_EXT_EEPROM		0
-// External EEPROM address and size
-#define EXTERNAL_EEPROM_ADDR    0x50    // I2C address (7 bits)
-#define EXTERNAL_EEPROM_SIZE    32768   // only <=32k tested (64k might work?)
+#define WITH_SDCARD			1
+#define SDCS				47
+
+
+
+//////////////////////////////////////////////////
+// EXT RAM
+//////////////////////////////////////////////////
+#define WITH_EXT_RAM		0
+#define RAMCS				48
+#define RAMSIZE				32768
+
+
 
 
 //////////////////////////////////////////////////
@@ -93,10 +129,18 @@
 //////////////////////////////////////////////////
 // PS/2 keyboard
 //////////////////////////////////////////////////
-#define WITH_PS2KEY			1
+#define WITH_PS2KEY			0
 // PS2 pin definition
 #define PS2DATA				8
 #define PS2IRQ				3
+
+
+
+//////////////////////////////////////////////////
+// MegaPad (a modified Chatpad)
+//////////////////////////////////////////////////
+#define WITH_MEGAPAD 		1
+
 
 
 //////////////////////////////////////////////////
@@ -106,6 +150,13 @@
 // buzzer pin
 #define BUZZER_PIN			5
 
+
+
+//////////////////////////////////////////
+// Debug serial output
+//////////////////////////////////////////
+
+#define MEGA_DEBUG 1
 
 /************ END CONFIGURATION DIRECTIVES ****************/
 

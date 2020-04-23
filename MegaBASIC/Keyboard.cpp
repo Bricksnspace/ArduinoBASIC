@@ -34,6 +34,8 @@
 #include "PS2Key.inc"
 #elif WITH_SERIAL_INPUT
 #include "TTYKey.inc"
+#elif WITH_MEGAPAD
+#include "MegaPad.inc"
 #else
 #error "Please choose a keyboard type"
 #endif	// WITH_PS2KEY

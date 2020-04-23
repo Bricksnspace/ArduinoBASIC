@@ -1,5 +1,6 @@
 /*
 	Copyright 2019 Mario Pascucci <mpascucci@gmail.com>
+	Copyright 2014 Robin Edwards
 
 	This is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,7 +20,7 @@
  * host.cpp
  *
  *  Created on: 08 mag 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 
@@ -71,9 +72,12 @@ namespace host {
 
 void init()
 {
-	screen::init();
 	keyboard::init();
+	screen::init();
 	buzzer::init();
+#if MEGA_DEBUG
+	Serial.begin(115200);
+#endif
 #if WITH_EXT_SCREEN
     //initTimer();
 #endif // WITH_EXT_SCREEN
@@ -98,7 +102,7 @@ int analogRead(int pin) {
 }
 
 
-// TODO: change to allow INPUT_PULLUP
+
 void pinMode(int pin,int mode) {
 	switch (mode)
 	{
@@ -183,6 +187,7 @@ char *floatToStr(float f, char *buf) {
     }
     else if (a<0.0001 || a>1000000) {
         // this will output -1.123456E99 = 14 characters max including trailing nul
+    	// TODO da controllare cosa esce
         //dtostre(f, buf, 7, 0);	// ATMega
     	dtostrf(f, 1, 7, buf);	// stm32
     }
@@ -280,40 +285,25 @@ char *readLine()
 
 	int startPosX = screen::getX();
 	int startPosY = screen::getY();
-    //int startPos = screen.getY()*SCREEN_WIDTH+screen.getX();
-    //int pos = startPos;
 
     bool done = false;
     while (!done) {
         while (keyboard::available()) {
-            // read the next key
-            //lineDirty[pos / SCREEN_WIDTH] = 1;
             char c = keyboard::read();
             buzzer::click();
-            //if (c>=32 && c<=126)
-            //    screenBuffer[pos++] = c;
-            //else if (c==PS2_DELETE && pos > startPos)
-            //    screenBuffer[--pos] = 0;
-            //else if (c==PS2_ENTER)
-            if (c == 0x0d)
+            if (c == KEY_CR)
+            {
             	done = true;
-            //curX = pos % SCREEN_WIDTH;
-            //curY = pos / SCREEN_WIDTH;
+            	break;
+            }
             // scroll if we need to
             if ((screen::getY() == SCREEN_HEIGHT-1) &&
             		screen::getX() == SCREEN_WIDTH-1) {
                 if (startPosY > 0) {
                     startPosY--;
-                    //pos -= SCREEN_WIDTH;
                     screen::outputChar(c);
                     screen::showBuffer();
                 }
-                //else
-                //{
-                //    screenBuffer[--pos] = 0;
-                //    curX = pos % SCREEN_WIDTH;
-                //    curY = pos / SCREEN_WIDTH;
-                //}
             }
             else
             {
@@ -332,9 +322,9 @@ char *readLine()
 char getKey() {
     char c = inkeyChar;
     inkeyChar = 0;
-    if (c >= 32 && c <= 126)
+//    if (c >= 32 && c <= 126)
         return c;
-    else return 0;
+//    else return 0;
 }
 
 bool ESCPressed() {
@@ -355,6 +345,8 @@ void outputFreeMem(unsigned int val)
     outputProgMemString(bytesFreeStr);
 }
 
+
+
 void saveProgram(bool autoexec, int size) {
     EEPROM.write(0, autoexec ? MAGIC_AUTORUN_NUMBER : 0x00);
     EEPROM.write(1, size & 0xFF);
@@ -371,6 +363,56 @@ int loadProgram() {
         mem[i] = EEPROM.read(i+3);
     return size;
 }
+
+
+#if WITH_SDCARD
+
+
+int SdDir(void)
+{
+	File root;
+	if (!SD.begin(SDCS)) {
+		Serial.println("initialization failed!");
+		return -1;
+	}
+	Serial.println("initialization done.");
+
+	root = SD.open("/");
+	for (;;)
+	{
+		File entry =  root.openNextFile();
+		if (! entry) {
+			// no more files
+			break;
+		}
+		outputString(entry.name());
+		if (entry.isDirectory())
+		{
+			outputChar('/');
+		}
+		else
+		{
+			outputChar('\t');
+			outputInt(entry.size()/1024);
+			outputChar('k');
+			outputChar('\n');
+		}
+		entry.close();
+	}
+	root.close();
+	return 0;
+}
+
+
+bool SdSave(char* filename)
+{
+
+}
+
+
+#endif
+
+
 
 #if EXTERNAL_EEPROM
 #include <I2cMaster.h>

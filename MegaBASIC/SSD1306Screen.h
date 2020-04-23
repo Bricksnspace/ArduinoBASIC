@@ -19,7 +19,7 @@
  * SSD1306Screen.h
  *
  *  Created on: 23 mag 2019
- *      Author: mario
+ *      Author: Mario Pascucci
  */
 
 #ifndef SSD1306SCREEN_H_

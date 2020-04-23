@@ -1,5 +1,6 @@
 /*
 	Copyright 2019 Mario Pascucci <mpascucci@gmail.com>
+	Copyright 2014 Robin Edwards
 
 	This is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -59,6 +60,9 @@ void loop()
         char *input = host::readLine();
         host::newLine();
         // tokenize
+#if MEGA_DEBUG
+        	Serial.println(input);
+#endif
         ret = tinybasic::tokenize((unsigned char*)input, tokenBuf, TOKEN_BUF_SIZE);
     }
     else {

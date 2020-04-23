@@ -28,6 +28,8 @@
 namespace screen {
 
 void init(void);
+void screenOff(void);
+void screenOn(void);
 void cls(void);
 void moveCursor(int, int);
 void showBuffer(void);
