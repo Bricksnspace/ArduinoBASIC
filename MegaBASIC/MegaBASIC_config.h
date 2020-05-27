@@ -50,6 +50,8 @@
 #define KEY_PAGEUP        136
 #define KEY_END           0x0F
 
+// some system defaults
+#define TAB_SIZE	8
 
 
 
@@ -76,10 +78,13 @@
 // 40chr * 40rows or 53chr * 30rows
 #define SPI_ILI9341	1
 
+
+#if SPI_ILI9341
 // size in pixel
 #define PIXEL_WIDTH		320
 #define PIXEL_HEIGHT	240
 // screen size in column/rows using a 5x7 base font, 6x8 character cell
+// leave 1 char cell on left for sys icons
 #define SCREEN_WIDTH        53
 #define SCREEN_HEIGHT       30
 // Screen SPI pins (I2C pins are hardware SDA/SCL on Arduino)
@@ -93,7 +98,41 @@
 #define SCR_SPI_RST -1
 // set to backlit pin or 0 if none
 #define SCR_BACKLIT 45
+#endif
 
+
+#if SPI_ST7735
+// size in pixel
+#define PIXEL_WIDTH		160
+#define PIXEL_HEIGHT	128
+// screen size in column/rows using a 5x7 base font, 6x8 character cell
+// leave 1 char cell on left for sys icons
+#define SCREEN_WIDTH        26
+#define SCREEN_HEIGHT       16
+// Screen SPI pins (I2C pins are hardware SDA/SCL on Arduino)
+// using hardware SPI
+#define SCR_SPI_MOSI 51
+#define SCR_SPI_CLK 52
+#define SCR_SPI_DC 46
+#define SCR_SPI_CS 49
+// use -1 for reset if pin is connected to Arduino Reset
+#define SCR_SPI_RST -1
+// set to backlit pin or 0 if none
+#define SCR_BACKLIT 45
+#endif
+
+
+#if I2C_SSD1306
+// size in pixel
+#define PIXEL_WIDTH		128
+#define PIXEL_HEIGHT	64
+// screen size in column/rows using a 5x7 base font, 6x8 character cell
+// leave 1 char cell on left for sys icons
+#define SCREEN_WIDTH        21
+#define SCREEN_HEIGHT       8
+// no backlit
+#define SCR_BACKLIT 0
+#endif
 
 
 
@@ -111,9 +150,16 @@
 //////////////////////////////////////////////////
 #define WITH_EXT_RAM		0
 #define RAMCS				48
+
+#if WITH_EXT_RAM
 #define RAMSIZE				32768
-
-
+#define RAMADDRBYTES		2
+// 2 byte = 16 bit addr
+// 3,4 byte = 32 bit addr
+typedef uint16_t	xraddr;
+#else
+#define RAMSIZE 4096
+#endif
 
 
 //////////////////////////////////////////////////

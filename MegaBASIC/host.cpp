@@ -25,11 +25,11 @@
 
 
 #include "Arduino.h"
-
+#include <avr/wdt.h>
 
 #include "host.h"
+#include "BasicErrors.h"
 
-extern unsigned char mem[];
 
 #include <EEPROM.h>
 extern EEPROMClass EEPROM;
@@ -42,36 +42,24 @@ char inkeyChar = 0;
 const char bytesFreeStr[] PROGMEM = "bytes free\n";
 
 
-#if WITH_EXT_SCREEN
-// used for cursor blinking on external I2C/SPI display
-#define BLINK_TIME	400			// in milliseconds
-//int timer1_counter;
-//#define TIMER_VAL	34286
 
-//void initTimer() {
-//    noInterrupts();           // disable all interrupts
-//    TCCR1A = 0;
-//    TCCR1B = 0;
-//    //timer1_counter = 34286;   // preload timer 65536-16MHz/256/2Hz
-//    TCNT1 = TIMER_VAL;   // preload timer
-//    TCCR1B |= (1 << CS12);    // 256 prescaler
-//    TIMSK1 |= (1 << TOIE1);   // enable timer overflow interrupt
-//    interrupts();             // enable all interrupts
-//}
-//
-//ISR(TIMER1_OVF_vect)        // interrupt service routine
-//{
-//    TCNT1 = TIMER_VAL;   // preload timer
-//    screen::blink();
-//    screen::redraw();
-//}
-#endif // WITH_EXT_SCREEN
+
+#if !WITH_EXT_RAM
+	unsigned char mem[RAMSIZE];
+#endif // ! WITH_EXT_RAM
+
 
 namespace host {
 
+#if WITH_EXT_RAM
+	Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI();  // use hardware SPI
+#endif  // WITH_EXT_RAM
 
 void init()
 {
+#if WITH_EXT_RAM
+	fram.begin(RAMCS, RAMADDRBYTES);
+#endif  // WITH_EXT_RAM
 	keyboard::init();
 	screen::init();
 	buzzer::init();
@@ -83,7 +71,106 @@ void init()
 #endif // WITH_EXT_SCREEN
 }
 
+#if WITH_EXT_RAM
 
+// read size bytes from address addr in buf
+void xrread(xraddr addr, byte *buf, xraddr size)
+{
+	fram.read(addr, buf, size);
+}
+
+
+
+// read size bytes from address addr in buf
+byte xrread8(xraddr addr)
+{
+	fram.read8(addr);
+}
+
+
+
+// external RAM version of memmove(dest,src,size)
+void xrmove(xraddr dest, xraddr src, xraddr num)
+{
+	if (dest == src || num == 0)
+		return;
+	if (dest < src)
+	{
+		fram.writeEnable(true);
+//		if (src-dest < 8)
+//		{
+//			for (xraddr i=0;i<num;i++)
+//			{
+//				fram.write8(dest+i,fram.read8(src+i));
+//			}
+//		}
+//		else
+//		{
+			byte b[8];
+			while (num > 8)
+			{
+				fram.read(src,b,8);
+				fram.write(dest,b,8);
+				num -= 8;
+				src += 8;
+				dest += 8;
+			}
+			fram.read(src,(byte*)&b,num);
+			fram.write(dest, (byte*)&b, num);
+//		}
+		fram.writeEnable(false);
+		return;
+	}
+	else
+	{
+		fram.writeEnable(true);
+//		if (dest-src < 8)
+//		{
+//			// it is an unsigned, can't be less than 0
+//			for (xraddr i=num;i<1;i--)
+//			{
+//				fram.write8(dest+i-1,fram.read8(src+i-1));
+//			}
+//		}
+//		else
+//		{
+			byte b[8];
+			while (num > 8)
+			{
+				num -= 8;
+				fram.read(src+num,b,8);
+				fram.write(dest+num,b,8);
+			}
+			fram.read(src,(byte*)&b,num);
+			fram.write(dest, (byte*)&b, num);
+//		}
+		fram.writeEnable(false);
+		return;
+	}
+}
+
+
+
+// write size bytes to address addr
+void xrwrite(xraddr addr, byte *buf, xraddr size)
+{
+	fram.writeEnable(true);
+	fram.write(addr, buf, size);
+	fram.writeEnable(false);
+}
+
+
+void xrwrite8(xraddr addr, byte b)
+{
+	fram.writeEnable(true);
+	fram.write8(addr, b);
+	fram.writeEnable(false);
+}
+
+
+
+
+#endif // WITH_EXT_RAM
 
 void sleep(long ms) {
     delay(ms);
@@ -146,13 +233,41 @@ void plot(int x, int y)
 }
 
 
+void line(int x, int y, int x1, int y1)
+{
+	screen::line(x,y,x1,y1);
+}
+
+
+void circle(int x, int y, int r)
+{
+	screen::circle(x, y, r);
+}
+
+
+
+void rect(int x, int y, int w, int h)
+{
+	screen::rect(x, y, w, h);
+}
+
+
+
 void cls() {
 	screen::cls();
 }
 
+
+void bgr(int r, int g, int b)
+{
+	screen::background(r,g,b);
+}
+
+
 void moveCursor(int x, int y) {
 	screen::moveCursor(x, y);
 }
+
 
 void showBuffer() {
 	screen::showBuffer();
@@ -188,17 +303,17 @@ char *floatToStr(float f, char *buf) {
     else if (a<0.0001 || a>1000000) {
         // this will output -1.123456E99 = 14 characters max including trailing nul
     	// TODO da controllare cosa esce
-        //dtostre(f, buf, 7, 0);	// ATMega
-    	dtostrf(f, 1, 7, buf);	// stm32
+        dtostre(f, buf, 7, 0);	// ATMega
+    	//dtostrf(f, 1, 7, buf);	// stm32
     }
     else {
     	int decPos = 0;
-    	if (f >= 100000.0) decPos = 1;
-    	else if (f >= 10000.0) decPos = 2;
-		else if (f >= 1000.0) decPos = 3;
-		else if (f >= 100.0) decPos = 4;
-    	else if (f >= 10.0) decPos = 5;
-    	else if (f >= 1.0) decPos = 6;
+    	if (a >= 100000.0) decPos = 1;
+    	else if (a >= 10000.0) decPos = 2;
+		else if (a >= 1000.0) decPos = 3;
+		else if (a >= 100.0) decPos = 4;
+    	else if (a >= 10.0) decPos = 5;
+    	else if (a >= 1.0) decPos = 6;
     	else decPos = 7;
         dtostrf(f, 1, decPos, buf);
         if (decPos) {
@@ -216,7 +331,7 @@ char *floatToStr(float f, char *buf) {
 }
 
 void outputFloat(float f) {
-    char buf[16];
+    char buf[20];
     screen::outputString(floatToStr(f, buf));
 }
 
@@ -281,10 +396,7 @@ char *readLine()
 
     //if (curX == 0) memset(screenBuffer + SCREEN_WIDTH*(curY), 32, SCREEN_WIDTH);
     //else host_newLine();
-	screen::freeLine();
-
-	int startPosX = screen::getX();
-	int startPosY = screen::getY();
+	screen::startInput();
 
     bool done = false;
     while (!done) {
@@ -294,16 +406,6 @@ char *readLine()
             if (c == KEY_CR)
             {
             	done = true;
-            	break;
-            }
-            // scroll if we need to
-            if ((screen::getY() == SCREEN_HEIGHT-1) &&
-            		screen::getX() == SCREEN_WIDTH-1) {
-                if (startPosY > 0) {
-                    startPosY--;
-                    screen::outputChar(c);
-                    screen::showBuffer();
-                }
             }
             else
             {
@@ -315,16 +417,14 @@ char *readLine()
     // remove the cursor
     screen::showCursor(false);
     screen::showBuffer();
-    return screen::getBuffer(startPosX, startPosY);
+    return screen::getBuffer();
 }
 #endif
 
 char getKey() {
     char c = inkeyChar;
     inkeyChar = 0;
-//    if (c >= 32 && c <= 126)
-        return c;
-//    else return 0;
+    return c;
 }
 
 bool ESCPressed() {
@@ -343,6 +443,14 @@ void outputFreeMem(unsigned int val)
     outputInt(val);
     outputChar(' ');
     outputProgMemString(bytesFreeStr);
+}
+
+
+void reset(void)
+{
+	wdt_disable();
+	wdt_enable(WDTO_15MS);
+	while (1) {};
 }
 
 
@@ -368,16 +476,35 @@ int loadProgram() {
 #if WITH_SDCARD
 
 
+//int initSD(SdVolume *vol)
+//{
+//	bool ret;
+//	Sd2Card card;
+//	ret = card.init(SPI_HALF_SPEED, SDCS);
+//	if (!ret)
+//		return ERROR_SD_NOT_FOUND;
+//	ret = vol->init(card);
+//	if (!ret)
+//		return ERROR_VOLUME_NOT_FOUND;
+//	return ERROR_NONE;
+//}
+
+
 int SdDir(void)
 {
 	File root;
-	if (!SD.begin(SDCS)) {
-		Serial.println("initialization failed!");
-		return -1;
-	}
-	Serial.println("initialization done.");
 
+//	ret = initSD(&v);
+//	if (ret != ERROR_NONE)
+//		return ret;
+//	if (!root.openRoot(&v))
+//		return ERROR_ROOT_UNREADABLE;
+	if (!SD.begin(SPI_HALF_SPEED,SDCS)) {
+		return ERROR_SD_NOT_FOUND;
+	}
 	root = SD.open("/");
+	if (!root)
+		return ERROR_ROOT_UNREADABLE;
 	for (;;)
 	{
 		File entry =  root.openNextFile();
@@ -395,19 +522,107 @@ int SdDir(void)
 			outputChar('\t');
 			outputInt(entry.size()/1024);
 			outputChar('k');
-			outputChar('\n');
 		}
+		outputChar('\n');
 		entry.close();
 	}
 	root.close();
-	return 0;
+	SD.end();
+	return ERROR_NONE;
 }
 
 
-bool SdSave(char* filename)
+int SdSave(char* filename, byte* buf, uint16_t size)
 {
-
+	File s;
+	if (strlen(filename) > MAX_FILENAME)
+		return ERROR_BAD_PARAMETER;
+	if (!SD.begin(SPI_HALF_SPEED,SDCS)) {
+		return ERROR_SD_NOT_FOUND;
+	}
+	char *e = filename + strlen(filename) - 4;
+	if (strcasecmp(e,".bas") != 0)
+		strcat(filename,".bas");
+	if (SD.exists(filename))
+	{
+		SD.end();
+		return ERROR_FILE_EXISTS;
+	}
+	s = SD.open(filename, FILE_WRITE);
+    //for (uint16_t i=0; i<size; i++)
+    s.write(buf, size);
+    s.close();
+    if (s.getWriteError())
+	{
+		SD.end();
+    	return ERROR_FILE_WRITE;
+	}
+    SD.end();
+    return ERROR_NONE;
 }
+
+
+int SdLoad(char* filename, byte* buf, int *len)
+{
+	File s;
+	if (strlen(filename) > MAX_FILENAME)
+		return ERROR_BAD_PARAMETER;
+	if (!SD.begin(SPI_HALF_SPEED,SDCS)) {
+		return ERROR_SD_NOT_FOUND;
+	}
+	char *e = filename + strlen(filename) - 4;
+	if (strcasecmp(e,".bas") != 0)
+		strcat(filename,".bas");
+	if (!SD.exists(filename))
+	{
+		SD.end();
+		return ERROR_FILE_NOT_FOUND;
+	}
+	s = SD.open(filename);
+	if (s.isDirectory())
+	{
+		SD.end();
+		return ERROR_IS_DIRECTORY;
+	}
+	uint16_t size = s.size();
+	if (size > RAMSIZE)
+	{
+		SD.end();
+		return ERROR_OUT_OF_MEMORY;
+	}
+	uint16_t l = s.read(buf, size);
+	SD.end();
+	if (l < size)	// short read, error?
+		return ERROR_FILE_READ;
+	*len = size;
+	return ERROR_NONE;
+}
+
+
+int SdDel(char * filename)
+{
+	if (strlen(filename) > MAX_FILENAME)
+		return ERROR_BAD_PARAMETER;
+	if (!SD.begin(SPI_HALF_SPEED,SDCS)) {
+		return ERROR_SD_NOT_FOUND;
+	}
+	char *e = filename + strlen(filename) - 4;
+	if (strcasecmp(e,".bas") != 0)
+		strcat(filename,".BAS");
+	if (!SD.exists(filename))
+	{
+		SD.end();
+		return ERROR_FILE_NOT_FOUND;
+	}
+	if (!SD.remove(filename))
+	{
+		SD.end();
+		return ERROR_FILE_DELETE_FAIL;
+	}
+	SD.end();
+	return ERROR_NONE;
+}
+
 
 
 #endif

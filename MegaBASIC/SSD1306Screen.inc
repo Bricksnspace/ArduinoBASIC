@@ -29,16 +29,11 @@
 #include "Adafruit_GFX.h"
 
 
-// TODO: to optimize text see scroll functions
 
 namespace screen {
 
-char screenBuffer[SCREEN_HEIGHT][SCREEN_WIDTH+1];
-char lineDirty[SCREEN_HEIGHT];
-int curX = 0, curY = 0;
-bool inputMode = false;
-volatile bool flash = 1, needRedraw = 0;
-int curColor = WHITE;
+uint16_t fgColor = WHITE;
+uint16_t bgColor = BLACK;
 
 
 // TODO: this is for I2C display, add SPI when available
@@ -53,18 +48,18 @@ Adafruit_SSD1306 display(PIXEL_WIDTH, PIXEL_HEIGHT, &Wire, -1);
 void init()
 {
 	display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-	display.setTextColor(WHITE,BLACK);
+	display.setTextColor(fgColor,bgColor);
 	display.setTextWrap(false);
 }
 
-void cls(void)
+
+void clear(void)
 {
-	memset(screenBuffer, 32, sizeof(screenBuffer));
+	display.setTextColor(fgColor,bgColor);
 	display.clearDisplay();
-	display.setCursor(0, 0);
 	display.display();
-	curX = curY = 0;
 }
+
 
 
 void moveCursor(int x, int y)
@@ -78,170 +73,22 @@ void showBuffer(void)
     for (int y=0; y<SCREEN_HEIGHT; y++) {
         if (lineDirty[y] || (inputMode && y==curY)) {
             moveCursor(0,y);
-            screenBuffer[y][SCREEN_WIDTH] = 0;	// make sure string is terminated
-            display.print(screenBuffer[y]);
-//            for (int x=0; x<SCREEN_WIDTH; x++) {
-//                char c = screenBuffer[y][x];
-                // XXX move to buffer writing if (c=='\r') c = ' ';
-//                tft.write(c);
-//            }
+            for (int x=0; x<SCREEN_WIDTH; x++)
+            {
+                display.write(screenBuffer[y][x]);
+            }
             lineDirty[y] = 0;
         }
     }
-    if (inputMode && flash)
+    if (inputMode)
     {
-    	display.setCursor(curX*CHAR_WIDTH, curY*LINE_HEIGHT);
-    	display.print('\x16');
+    	moveCursor(curX, curY);
+    	display.write('\x16');
     }
     display.display();
 }
 
 
-void blink(void) {
-	flash = !flash;
-}
-
-
-//void redraw(void)
-//{
-//	needRedraw = true;
-//}
-
-
-void scrollBuffer(void) {
-    memcpy(screenBuffer[0], screenBuffer[1], (SCREEN_WIDTH+1)*(SCREEN_HEIGHT-1));
-    memset(screenBuffer[SCREEN_HEIGHT-1], 32, SCREEN_WIDTH);
-    memset(lineDirty, 1, SCREEN_HEIGHT);
-}
-
-
-int outputChar(char c)
-{
-	//tft.print(c);
-//    int pos = curY*SCREEN_WIDTH+curX;
-	switch (c)
-	{
-	case 0x7f:
-	//if (c==0x7f)		// ASCII Del as Backspace
-    //{
-    	if (curX == 0)
-    	{
-    		if (curY > 0)
-    		{
-    			curY--;
-    			curX = SCREEN_WIDTH;
-    		}
-    		else
-    			return 0;
-    	}
-    	curX--;
-    	screenBuffer[curY][curX] = 32;
-    	lineDirty[curY] = 1;
-    	break;
-    //}
-	case '\n':
-		// do a "newline" with implicit "CR"
-    //else if (c == '\n')
-    //{
-    	if (++curY == SCREEN_HEIGHT)
-    	{
-    		scrollBuffer();
-    		curY--;
-    	}
-    	curX = 0;
-    	break;
-	case '\r':
-		// do a "CR" without a newline
-		curX = 0;
-		lineDirty[curY] = 1;
-		break;
-    //}
-	default:
-        screenBuffer[curY][curX++] = c;
-        lineDirty[curY] = 1;
-        if (curX >= SCREEN_WIDTH)
-        {
-        	if (++curY >= SCREEN_HEIGHT)
-        	{
-        		scrollBuffer();
-        		curY--;
-        	}
-        	curX = 0;
-        }
-    }
-    return 0;
-}
-
-
-int outputInt(long num)
-{
-	char buf[14];
-	sprintf(buf, "%ld",num);
-	int l = strlen(buf);
-	outputString(buf);
-	return l;
-}
-
-
-
-void outputString(char * str)
-{
-	while (*str)
-	{
-		outputChar(*str++);
-	}
-}
-
-
-
-void outputProgMemString(const char* p) {
-    while (1) {
-        unsigned char c = pgm_read_byte(p++);
-        if (c == 0) break;
-        outputChar((char)c);
-    }
-}
-
-
-
-
-
-void newLine(void)
-{
-	outputChar('\n');
-}
-
-
-
-int getX(void) {
-	return curX;
-}
-
-
-int getY(void) {
-	return curY;
-}
-
-
-void freeLine(void) {
-//    if (curX == 0) memset(screenBuffer + SCREEN_WIDTH*(curY), 32, SCREEN_WIDTH);
-//    else newLine();
-}
-
-
-
-void showCursor(bool show)
-{
-	inputMode = show;
-	lineDirty[curY] = 1;
-	showBuffer();
-}
-
-
-char* getBuffer(int , int ) {
-//	return screenBuffer+y*SCREEN_WIDTH+x;
-	return nullptr;
-}
 
 
 // graphic functions
@@ -250,26 +97,51 @@ char* getBuffer(int , int ) {
 void color(unsigned char r, unsigned char g, unsigned char b)
 {
 	if (r == 0 && g == 0 && b == 0)
-		curColor = BLACK;
+		fgColor = BLACK;
 	else
-		curColor = WHITE;
+		fgColor = WHITE;
 }
 
-
-void color(unsigned int c)
+void background(unsigned char r, unsigned char g, unsigned char b)
 {
-	// INVERSE doesn't work as expected, but leave here the code, just in case...
-	if (c == 2) c = INVERSE;
-	else if (c > 2) c = WHITE;
-	curColor = c;
+	if (r == 0 && g == 0 && b == 0)
+		bgColor = BLACK;
+	else
+		bgColor = WHITE;
 }
+
 
 
 void plot(int x, int y)
 {
-	display.writePixel(x,y,(unsigned)curColor);
+	display.writePixel(x,y,(unsigned)fgColor);
 	display.display();
 }
+
+
+
+void line(int x, int y, int x1, int y1)
+{
+	display.drawLine(x, y, x1, y1, fgColor);
+	display.display();
+}
+
+
+void circle(int x, int y, int r)
+{
+	display.drawCircle(x, y, r, fgColor);
+	display.display();
+}
+
+
+void rect(int x, int y, int w, int h)
+{
+	display.drawRect(x, y, w, h, fgColor);
+	display.display();
+}
+
+
+
 
 
 } /* namespace screen */

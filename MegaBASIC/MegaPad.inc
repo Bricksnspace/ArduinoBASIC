@@ -90,7 +90,6 @@ char read(void)
 		char c = keyBuffer[tail];
 		tail++;
 		tail %= KEYBUFFERSIZE;
-		Serial.println(c,HEX);
 		return c;
 	}
 	return 0;

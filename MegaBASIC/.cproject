@@ -32,6 +32,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Adafruit_SSD1306}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/SD/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Adafruit_FRAM_SPI}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1920852690" name="Sorgente CPP" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -50,6 +51,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Adafruit_SSD1306}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/SD/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Adafruit_FRAM_SPI}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.790680061" name="Sorgente C" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -68,6 +70,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Adafruit_SSD1306}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/SD/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MegaBASIC/libraries/Adafruit_FRAM_SPI}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1307584505" name="Sorgente Assembly" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

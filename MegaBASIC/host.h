@@ -40,22 +40,13 @@
 // buzzer
 #include "Buzzer.h"
 
-
-// program memory
-#define WITH_INTERNAL_RAM 	1
-
-#define WITH_EXTERNAL_RAM	0
-
-#if WITH_INTERNAL_RAM
-#define MEMORY_SIZE	512
-#elif WITH_EXTERNAL_RAM
-#define MEMORY_SIZE 32768
-#else
-#error "Please choose RAM type"
-#endif	// RAM
+#if WITH_EXT_RAM
+#include <Adafruit_FRAM_SPI.h>
+#endif
 
 #if WITH_SDCARD
 #include <SD.h>
+#define MAX_FILENAME	8
 #endif
 
 #define MAGIC_AUTORUN_NUMBER    0xFC
@@ -67,6 +58,13 @@ void click(void);
 void startupTone(void);
 void sleep(long ms);
 void digitalWrite(int pin,int state);
+#if WITH_EXT_RAM
+xraddr xrmove(xraddr dest, xraddr src, xraddr size);
+void xrread(xraddr addr, byte * buf, xraddr size);
+byte xrread8(xraddr addr);
+void xrwrite(xraddr, byte * buf, xraddr size);
+void xrwrite8(xraddr addr, byte b);
+#endif
 int digitalRead(int pin);
 int analogRead(int pin);
 void pinMode(int pin, int mode);
@@ -90,9 +88,19 @@ int loadProgram();
 // graphic functions
 void color(int,int,int);
 void plot(int, int);
+void line(int, int, int, int);
+void bgr(int, int, int);
+void circle(int, int, int);
+void rect(int, int, int, int);
+// special functions
+void reset(void);
+
 
 #if WITH_SDCARD
 int SdDir(void);
+int SdSave(char* filename, byte* buf, uint16_t size);
+int SdLoad(char* filename, byte* buf, int *len);
+int SdDel(char* filename);
 #endif
 
 #if WITH_EXT_EEPROM

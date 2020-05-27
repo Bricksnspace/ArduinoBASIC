@@ -37,7 +37,7 @@ void scrollBuffer(void);
 int getX(void);
 int getY(void);
 void showCursor(bool );
-void freeLine(void);
+void startInput(void);
 void blink(void);
 //void redraw(void);
 void outputString(char const *s);
@@ -45,11 +45,14 @@ void outputProgMemString(const char *s);
 int outputChar(char);
 int outputInt(long num);
 void newLine(void);
-char *getBuffer(int , int );
+char *getBuffer(void);
 // graphic functions
 void color(unsigned char,unsigned char, unsigned char);
-void color(unsigned int);
 void plot(int,int);
+void line(int, int, int, int);
+void rect(int, int, int, int);
+void circle(int, int, int);
+void background(unsigned char,unsigned char, unsigned char);
 
 } /* namespace screen */
 

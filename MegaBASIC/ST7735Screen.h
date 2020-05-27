@@ -16,7 +16,7 @@
  */
 
 /*
- * OledScreen.h
+ * ST7735Screen.h
  *
  *  Created on: 07 apr 2019
  *      Author: Mario Pascucci

@@ -24,13 +24,13 @@
 
 #include "Arduino.h"
 
-
+#include "BasicErrors.h"
 #include "basic.h"
 #include "host.h"
 
 
 // BASIC
-unsigned char mem[MEMORY_SIZE];
+//unsigned char mem[RAMSIZE];
 #define TOKEN_BUF_SIZE    64
 unsigned char tokenBuf[TOKEN_BUF_SIZE];
 
@@ -58,11 +58,7 @@ void loop()
     if (!autorun) {
         // get a line from the user
         char *input = host::readLine();
-        host::newLine();
         // tokenize
-#if MEGA_DEBUG
-        	Serial.println(input);
-#endif
         ret = tinybasic::tokenize((unsigned char*)input, tokenBuf, TOKEN_BUF_SIZE);
     }
     else {
@@ -71,9 +67,9 @@ void loop()
         tokenBuf[1] = 0;
         autorun = 0;
     }
-    //host::newLine();
     // execute the token buffer
     if (ret == ERROR_NONE) {
+    	host::newLine();
         ret = tinybasic::processInput(tokenBuf);
     }
     if (ret != ERROR_NONE) {
